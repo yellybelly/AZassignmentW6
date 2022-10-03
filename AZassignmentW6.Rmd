@@ -1,0 +1,62 @@
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+places <- read.csv('Arrival Delays .csv')
+places
+```
+
+Change the blank columns to names: Airline and Arrival and remove the missing row (NAs)
+```{r}
+places <- places %>% 
+    rename('Airline' = 1, 'Arrival' = 2)
+places <- na.omit(places)
+places
+```
+```{r}
+places[2, "Airline"] <- "ALASKA"
+places[4, "Airline"] <- "AM WEST"
+places
+```
+
+
+```{r}
+places <- places %>%
+        pivot_longer(!c("Airline", "Arrival"),
+                     names_to = "Cities",               
+                     values_to = "Amount")      
+places
+```
+
+Fill in the empty spaces with the appropriate airline name 
+```{r}
+places[2, "Airline"] <- "ALASKA"
+places[4, "Airline"] <- "AM WEST"
+places
+```
+Analysis: make a data frame of all of the delayed flights  
+
+```{r}
+delayed <- places %>%
+                    filter(places$Arrival == "Delayed")
+delayed
+```
+Analysis: make a data frame of all of the on time flights 
+
+```{r}
+On_time <- places %>%
+                    filter(places$Arrival == "On time")
+On_time
+```
+Now, graph the data frames to compare
+
+```{r}
+ggplot(data=On_time, aes(x=Cities, y=Amount, fill = Airline)) +
+      geom_bar(stat="identity", position=position_dodge())
+
+ggplot(data=delayed, aes(x=Cities, y=Amount,  fill = Airline)) +
+      geom_bar(stat="identity", position=position_dodge())
+```
+Here it is shown that ALASKA has less on time flights than AM WEST in San Francisco and Seattle. ALASKA has less delayed flights than AM WEST in Los Angeles, Phoenix, San Diego, and San Francisco. AM WEST has less delayed flights than ALASKA in Seattle and more on time flights in Los Angeles, Phoenix, and san Diego.
+
+
